@@ -5,10 +5,12 @@ import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:taskati/core/constants/app_images.dart';
 import 'package:taskati/core/functions/dialogs.dart';
+import 'package:taskati/core/functions/naviagtion.dart';
+import 'package:taskati/core/services/local_helper.dart';
 import 'package:taskati/core/utils/colors.dart';
 import 'package:taskati/core/widgets/custom_text_field.dart';
 import 'package:taskati/core/widgets/main_button.dart';
-import 'package:taskati/features/AddTask/pages/add_task.dart';
+import 'package:taskati/features/home/page/home_screen.dart';
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({super.key});
@@ -18,7 +20,7 @@ class UploadScreen extends StatefulWidget {
 }
 
 class _UploadScreenState extends State<UploadScreen> {
-  String path = '';
+  String imagePath = '';
   var nameController = TextEditingController();
 
   @override
@@ -28,19 +30,14 @@ class _UploadScreenState extends State<UploadScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              if (path.isNotEmpty && nameController.text.isNotEmpty) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HomeScreen(
-                      userName: nameController.text,
-                      userImagePath: path,
-                    ),
-                  ),
-                );
-              } else if (path.isNotEmpty && nameController.text.isEmpty) {
+              if (imagePath.isNotEmpty && nameController.text.isNotEmpty) {
+                // save data to hive
+                LocalHelper.putUserData(nameController.text, imagePath);
+                // push to home screen
+                pushWithReplacement(context, const HomeScreen());
+              } else if (imagePath.isNotEmpty && nameController.text.isEmpty) {
                 showErrorDialog(context, 'Please Enter Your Name');
-              } else if (path.isEmpty && nameController.text.isNotEmpty) {
+              } else if (imagePath.isEmpty && nameController.text.isNotEmpty) {
                 showErrorDialog(context, 'Please Upload Your Image');
               } else {
                 showErrorDialog(
@@ -63,8 +60,8 @@ class _UploadScreenState extends State<UploadScreen> {
                 CircleAvatar(
                   radius: 80,
                   backgroundColor: AppColors.primaryColor,
-                  backgroundImage: path.isNotEmpty
-                      ? FileImage(File(path))
+                  backgroundImage: imagePath.isNotEmpty
+                      ? FileImage(File(imagePath))
                       : AssetImage(AppImages.emptyUser),
                 ),
                 Gap(20),
@@ -96,32 +93,6 @@ class _UploadScreenState extends State<UploadScreen> {
                   },
                   hint: 'Enter Your Name',
                 ),
-                Gap(30), // مسافة قبل الزر الجديد
-                MainButton(
-                  text: 'Go To Home',
-                  onPressed: () {
-                    if (path.isNotEmpty && nameController.text.isNotEmpty) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomeScreen(
-                            userName: nameController.text,
-                            userImagePath: path,
-                          ),
-                        ),
-                      );
-                    } else if (path.isNotEmpty && nameController.text.isEmpty) {
-                      showErrorDialog(context, 'Please Enter Your Name');
-                    } else if (path.isEmpty && nameController.text.isNotEmpty) {
-                      showErrorDialog(context, 'Please Upload Your Image');
-                    } else {
-                      showErrorDialog(
-                        context,
-                        'Please Enter Your Name and Upload Your Image',
-                      );
-                    }
-                  },
-                ),
               ],
             ),
           ),
@@ -137,7 +108,7 @@ class _UploadScreenState extends State<UploadScreen> {
 
     if (file != null) {
       setState(() {
-        path = file.path;
+        imagePath = file.path;
       });
     }
   }
