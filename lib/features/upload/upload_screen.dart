@@ -3,13 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:taskati/core/constants/app_images.dart';
-import 'package:taskati/core/functions/dialogs.dart';
-import 'package:taskati/core/functions/naviagtion.dart';
+import 'package:taskati/components/buttons/main_button.dart';
+import 'package:taskati/core/extentions/dialogs.dart';
+import 'package:taskati/core/extentions/navigation.dart';
 import 'package:taskati/core/services/local_helper.dart';
 import 'package:taskati/core/utils/colors.dart';
-import 'package:taskati/core/widgets/custom_text_field.dart';
-import 'package:taskati/core/widgets/main_button.dart';
 import 'package:taskati/features/home/page/home_screen.dart';
 
 class UploadScreen extends StatefulWidget {
@@ -20,9 +18,8 @@ class UploadScreen extends StatefulWidget {
 }
 
 class _UploadScreenState extends State<UploadScreen> {
-  String imagePath = '';
+  String? path;
   var nameController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,19 +27,19 @@ class _UploadScreenState extends State<UploadScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              if (imagePath.isNotEmpty && nameController.text.isNotEmpty) {
-                // save data to hive
-                LocalHelper.putUserData(nameController.text, imagePath);
-                // push to home screen
-                pushWithReplacement(context, const HomeScreen());
-              } else if (imagePath.isNotEmpty && nameController.text.isEmpty) {
-                showErrorDialog(context, 'Please Enter Your Name');
-              } else if (imagePath.isEmpty && nameController.text.isNotEmpty) {
-                showErrorDialog(context, 'Please Upload Your Image');
+              if (path != null && nameController.text.isNotEmpty) {
+                LocalHelper.cacheData(LocalHelper.kIsUpload, true);
+                LocalHelper.cacheData(LocalHelper.kName, nameController.text);
+                LocalHelper.cacheData(LocalHelper.kImage, path);
+                pushWithReplacement(context, HomeScreen());
+              } else if (path != null && nameController.text.isEmpty) {
+                showErrorDialog(context, 'Please enter your name');
+              } else if (path == null && nameController.text.isNotEmpty) {
+                showErrorDialog(context, 'Please upload your profile image');
               } else {
                 showErrorDialog(
                   context,
-                  'Please Enter Your Name and Upload Your Image',
+                  'Please enter your name and upload your profile image',
                 );
               }
             },
@@ -52,7 +49,7 @@ class _UploadScreenState extends State<UploadScreen> {
       ),
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -60,38 +57,32 @@ class _UploadScreenState extends State<UploadScreen> {
                 CircleAvatar(
                   radius: 80,
                   backgroundColor: AppColors.primaryColor,
-                  backgroundImage: imagePath.isNotEmpty
-                      ? FileImage(File(imagePath))
-                      : AssetImage(AppImages.emptyUser),
+                  backgroundImage: path != null
+                      ? FileImage(File(path ?? '')) as ImageProvider
+                      : AssetImage('assets/images/user.png'),
                 ),
                 Gap(20),
                 MainButton(
-                  width: 300,
-                  onPressed: () async {
-                    await uploadImage(isCamera: true);
-                  },
+                  width: 250,
                   text: 'Upload From Camera',
-                ),
-                Gap(15),
-                MainButton(
-                  width: 300,
-                  onPressed: () async {
-                    await uploadImage(isCamera: false);
+                  onPressed: () {
+                    uploadImage(true);
                   },
+                ),
+                Gap(10),
+                MainButton(
+                  width: 250,
                   text: 'Upload From Gallery',
+                  onPressed: () async {
+                    uploadImage(false);
+                  },
                 ),
                 Gap(20),
                 Divider(),
                 Gap(20),
-                CustomTextField(
+                TextFormField(
                   controller: nameController,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) {
-                      return 'Please Enter Your Name';
-                    }
-                    return null;
-                  },
-                  hint: 'Enter Your Name',
+                  decoration: InputDecoration(hintText: 'Enter your name'),
                 ),
               ],
             ),
@@ -101,15 +92,15 @@ class _UploadScreenState extends State<UploadScreen> {
     );
   }
 
-  Future<void> uploadImage({required bool isCamera}) async {
-    XFile? file = await ImagePicker().pickImage(
-      source: isCamera ? ImageSource.camera : ImageSource.gallery,
-    );
-
-    if (file != null) {
-      setState(() {
-        imagePath = file.path;
-      });
-    }
+  uploadImage(bool isCamera) async {
+    await ImagePicker()
+        .pickImage(source: isCamera ? ImageSource.camera : ImageSource.gallery)
+        .then((picker) {
+          if (picker != null) {
+            setState(() {
+              path = picker.path;
+            });
+          }
+        });
   }
 }

@@ -1,43 +1,43 @@
-import 'package:hive/hive.dart';
-
-// 1) init hive
-// 2) create helper class and open your box and take instance of it
-// 3) create function to put data and get data
-// 4) use this class and its methods to save and get data
-//! Note : Not Needed to Call init() Again After First Time !!
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:taskati/core/models/task_model.dart';
 
 class LocalHelper {
-  static late Box userBox;
-  static late Box taskBox;
+  static late Box _userBox;
+  static late Box<TaskModel> _taskBox;
+
+  static Box<TaskModel> get taskBox => _taskBox;
+
+  static Box get userBox => _userBox;
+
+  static String kUserBox = 'user';
+  static String kTaskBox = 'task';
 
   static String kName = 'name';
   static String kImage = 'image';
-  static String kIsUploaded = 'isUploaded';
+  static String kIsUpload = 'isUpload';
+  static String kIsDark = 'isDark';
 
   static init() async {
-    userBox = await Hive.openBox('userBox');
-    taskBox = await Hive.openBox('taskBox');
+    Hive.registerAdapter<TaskModel>(TaskModelAdapter());
+    await Hive.openBox(kUserBox);
+    await Hive.openBox<TaskModel>(kTaskBox);
+    _userBox = Hive.box(kUserBox);
+    _taskBox = Hive.box<TaskModel>(kTaskBox);
   }
 
-  static putData(String key, dynamic value) {
-    userBox.put(key, value);
+  static cacheData(String key, dynamic value) {
+    _userBox.put(key, value);
   }
 
   static getData(String key) {
-    return userBox.get(key);
+    return _userBox.get(key);
   }
 
-  // static putTask(String key, TaskModel value) {
-  //   taskBox.put(key, value);
-  // }
+  static cacheTask(String key, TaskModel task) {
+    _taskBox.put(key, task);
+  }
 
-  // static TaskModel getTask(String key) {
-  //   return taskBox.get(key);
-  // }
-
-  static putUserData(String name, String image) {
-    putData(kName, name);
-    putData(kImage, image);
-    putData(kIsUploaded, true);
+  static getTask(String key) {
+    return _taskBox.get(key);
   }
 }

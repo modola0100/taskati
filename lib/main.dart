@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:taskati/core/constants/app_fonts.dart';
 import 'package:taskati/core/services/local_helper.dart';
-import 'package:taskati/core/utils/colors.dart';
+import 'package:taskati/core/utils/themes.dart';
 import 'package:taskati/features/splash/splash_screen.dart';
 
 Future<void> main() async {
@@ -16,36 +15,18 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: AppColors.whiteColor,
-        fontFamily: AppFonts.poppinsFamily,
-        appBarTheme: AppBarTheme(
-          backgroundColor: AppColors.whiteColor,
-          surfaceTintColor: Colors.transparent,
-          centerTitle: true,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AppColors.primaryColor),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AppColors.primaryColor),
-          ),
-          errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AppColors.redColor),
-          ),
-          focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide(color: AppColors.redColor),
-          ),
-        ),
-      ),
-      home: SplashScreen(),
+    return ValueListenableBuilder(
+      valueListenable: LocalHelper.userBox.listenable(),
+      builder: (context, box, child) {
+        bool isDark = LocalHelper.getData(LocalHelper.kIsDark) ?? false;
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+          home: SplashScreen(),
+        );
+      },
     );
   }
 }

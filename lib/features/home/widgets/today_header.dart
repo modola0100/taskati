@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
-import 'package:taskati/core/functions/naviagtion.dart';
+import 'package:taskati/components/buttons/main_button.dart';
+import 'package:taskati/core/extentions/navigation.dart';
 import 'package:taskati/core/utils/text_styles.dart';
-import 'package:taskati/core/widgets/main_button.dart';
-import 'package:taskati/features/add_task/add_task_screen.dart';
+import 'package:taskati/features/add_task/page/add_task_screen.dart';
 
 class TodayHeader extends StatelessWidget {
   const TodayHeader({super.key});
@@ -18,18 +19,21 @@ class TodayHeader extends StatelessWidget {
             children: [
               Text(
                 DateFormat.yMMMMd().format(DateTime.now()),
-                style: TextStyles.titleStyle(),
+                style: TextStyles.getTitle(fontWeight: FontWeight.w600),
               ),
-              Text('Today', style: TextStyles.titleStyle()),
+              Text(
+                DateFormat.EEEE().format(DateTime.now()),
+                style: TextStyles.getTitle(fontWeight: FontWeight.w600),
+              ),
             ],
           ),
         ),
+        Gap(10),
         MainButton(
-          width: 140,
-          height: 40,
+          width: 138,
           text: '+ Add Task',
           onPressed: () {
-            pushTo(context, AddTaskScreen());
+            pushTo(context, AddEditTaskScreen());
           },
         ),
       ],
