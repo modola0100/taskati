@@ -17,6 +17,18 @@ class HomeHeader extends StatefulWidget {
 class _HomeHeaderState extends State<HomeHeader> {
   @override
   Widget build(BuildContext context) {
+    final nameRaw = LocalHelper.getData(LocalHelper.kName);
+    final imageRaw = LocalHelper.getData(LocalHelper.kImage);
+
+    final String displayName = (nameRaw is String && nameRaw.isNotEmpty)
+        ? nameRaw.split(' ').first
+        : 'Guest';
+
+    final ImageProvider avatarImage =
+        (imageRaw is String && imageRaw.isNotEmpty)
+        ? FileImage(File(imageRaw))
+        : const AssetImage('assets/images/user.png');
+
     return Row(
       children: [
         Expanded(
@@ -24,7 +36,7 @@ class _HomeHeaderState extends State<HomeHeader> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Hello, ${(LocalHelper.getData(LocalHelper.kName) as String).split(' ').first}',
+                'Hello, $displayName',
                 style: TextStyles.getTitle(
                   color: AppColors.primaryColor,
                   fontWeight: FontWeight.w500,
@@ -36,20 +48,19 @@ class _HomeHeaderState extends State<HomeHeader> {
         ),
         GestureDetector(
           onTap: () {
-            pushTo(context, ProfileScreen()).then((value) => setState(() {}));
+            pushTo(
+              context,
+              const ProfileScreen(),
+            ).then((value) => setState(() {}));
           },
           child: CircleAvatar(
             radius: 24,
             backgroundColor: AppColors.primaryColor,
-            child: CircleAvatar(
-              radius: 22,
-              backgroundImage: LocalHelper.getData(LocalHelper.kImage) != null
-                  ? FileImage(File(LocalHelper.getData(LocalHelper.kImage)))
-                  : AssetImage('assets/images/user.png'),
-            ),
+            child: CircleAvatar(radius: 22, backgroundImage: avatarImage),
           ),
         ),
       ],
     );
   }
 }
+// ...existing code...ر
