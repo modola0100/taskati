@@ -42,7 +42,7 @@ It is built with **clean code principles**, **Hive local storage**, and supports
 
 |Splah Screenn | Home screen | Add Task | Task Added| Profile Screen |
 |-------------|-----------|--------------|----------|----------|
-| ![splash](assets/images/1png) | ![Home](assets/images/2.png) | ![Add](assets/images/3.png) | ![Added](assets/images/4.png) | ![Profile](assets/images/55.png) |
+| ![splash](assets/images/1.png) | ![Home](assets/images/2.png) | ![Add](assets/images/3.png) | ![Added](assets/images/4.png) | ![Profile](assets/images/5.png) |
 
 ---
 
