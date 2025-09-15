@@ -46,12 +46,6 @@ It is built with **clean code principles**, **Hive local storage**, and supports
 
 ---
 
-## 📱 Full App Preview  
-
-![App Preview](assets/images/logo.png)  
-
----
-
 ## 🎨 Fonts & Assets  
 - **Font Family:** Poppins (Regular, Medium, SemiBold, Bold)  
 - **Assets:** Logo + images for UI  
@@ -68,3 +62,10 @@ It is built with **clean code principles**, **Hive local storage**, and supports
 
 ## 📱 App Icon  
 Customized launcher icon generated with **flutter_launcher_icons**.  
+![App Preview](assets/images/logo.png)  
+
+
+
+
+
+
